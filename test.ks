@@ -1,38 +1,65 @@
 //hellolaunch
 
-//First, we'll clear the terminal screen to make it look nice
-CLEARSCREEN.
-
-//Next, we'll lock our throttle to 100%.
-LOCK THROTTLE TO 1.0.   // 1.0 is the max, 0.0 is idle.
-
-//This is our countdown loop, which cycles from 5 to 0
-PRINT "Counting down:".
-FROM {local countdown is 5.} UNTIL countdown = 0 STEP {SET countdown to countdown - 1.} DO {
-    PRINT "..." + countdown.
-    WAIT 1. // pauses the script here for 1 second.
+function parachute_test_zone {
+    RETURN (ship:altitude > 5000)
+    and (ship:altitude < 9999) 
+    and (ship:verticalSpeed > 30) 
+    and (ship:verticalSpeed < 160).
 }
 
-LOCK STEERING TO UP.
+function chute_zone {
+    RETURN (ship:altitude < 5000).
+}
 
-STAGE.
+function launch {
+    CLEARSCREEN.
+    LOCK THROTTLE TO 1.0.   // 1.0 is the max, 0.0 is idle.
+    PRINT "Counting down:".
+    LOCK STEERING TO UP.
+    FROM {local countdown is 5.} UNTIL countdown = 0 STEP {SET countdown to countdown - 1.} DO {
+        PRINT "..." + countdown.
+        WAIT 1. // pauses the script here for 1 second.
+    }
+    // Launch
+    PRINT "Launching!!!".
+    STAGE.
+}
 
-// UNTIL SHIP:MAXTHRUST > 0 {
-//     WAIT 0.5. // pause half a second between stage attempts.
-//     PRINT "Stage activated.".
-//     STAGE. // same as hitting the spacebar.
-// }
+function vacuum_explorer {
+    launch.
+    wait until maxThrust = 0.
+    stage.
+    wait until chute_zone.
+    stage.
+}
 
-WAIT UNTIL SHIP:VERTICALSPEED < 0.
+vacuum_explorer.
 
-STAGE.
 
-WAIT 5.
+// launch.
 
-// NOTE that it is vital to not just let the script end right away
-// here.  Once a kOS script just ends, it releases all the controls
-// back to manual piloting so that you can fly the ship by hand again.
-// If the program just ended here, then that would cause the throttle
-// to turn back off again right away and nothing would happen.
+// WAIT UNTIL maxThrust = 0.
+
+// STAGE.
+// PRINT "DROPPING TANKS!!!".
+
+// WAIT UNTIL parachute_test_zone.
+
+// STAGE.
+// PRINT "STAGE SEPARATION!!!".
+
+// STAGE.
+// PRINT "DROGUE CHUTES!!!".
+
+// WAIT 5.
+
+// STAGE.
+// PRINT "MAIN CHUTES!!!".
+
+// // NOTE that it is vital to not just let the script end right away
+// // here.  Once a kOS script just ends, it releases all the controls
+// // back to manual piloting so that you can fly the ship by hand again.
+// // If the program just ended here, then that would cause the throttle
+// // to turn back off again right away and nothing would happen.
 
 
